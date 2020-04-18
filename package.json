@@ -1,0 +1,33 @@
+{
+  "name": "arcado-backend-lisk",
+  "version": "1.0.0",
+  "description": "Arcado Network backend that integrates with Lisk SDK",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arcadonetwork/arcado-backend-lisk.git"
+  },
+  "keywords": [
+    "lisk",
+    "node",
+    "javascript",
+    "express"
+  ],
+  "author": "Michiel Mulders, Tom Ploem",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/arcadonetwork/arcado-backend-lisk/issues"
+  },
+  "homepage": "https://github.com/arcadonetwork/arcado-backend-lisk#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.3"
+  }
+}

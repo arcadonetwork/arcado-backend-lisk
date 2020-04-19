@@ -1,4 +1,4 @@
-const usersModule = require('../modules/users.mod');
+const { addUser, getUser } = require('../modules/users.mod');
 
 const routes = require('express').Router();
 const liskPassphrase = require('@liskhq/lisk-passphrase');
@@ -15,7 +15,7 @@ routes.post('/register', (req, res) => {
 
     const passphrase = Mnemonic.generateMnemonic();
     const liskAddressObject = liskCrypto.getAddressAndPublicKeyFromPassphrase(passphrase);
-    usersModule.addUser(email, liskAddressObject.address, liskAddressObject.publicKey);
+    addUser(email, liskAddressObject.address, liskAddressObject.publicKey);
 
     res.json({
         passphrase,
@@ -31,7 +31,7 @@ routes.post('/register', (req, res) => {
  */
 routes.get('/:email', (req, res, next) => {
     const email = req.params.email;
-    const user = usersModule.getUser(email)
+    const user = getUser(email)
 
     if (!user) {
         return res.json({ msg: 'User not found', error: true, status: 200 })

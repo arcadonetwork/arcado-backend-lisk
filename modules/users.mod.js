@@ -1,7 +1,7 @@
 // In-mem DB for [ { email, address, publicKey }]
 let usersDB = [];
 
-const getAllUsers = () => (users)
+const getAllUsers = () => (usersDB)
 
 const getUser = email => usersDB.find(user => user.email === email)
 

@@ -29,7 +29,7 @@ routes.post('/register', (req, res) => {
  * Param: email
  * Return: { address, publicKey, email }
  */
-routes.get('/:email', (req, res, next) => {
+routes.get('/:email', (req, res) => {
     const email = req.params.email;
     const user = getUser(email)
 

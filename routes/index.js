@@ -1,9 +1,9 @@
-const authRoutes = require('./auth');
+const usersRoutes = require('./users');
 const gamesRoutes = require('./games');
 const roomsRoutes = require('./rooms');
 
 module.exports = {
-    auth: authRoutes,
+    users: usersRoutes,
     games: gamesRoutes,
     rooms: roomsRoutes
 };

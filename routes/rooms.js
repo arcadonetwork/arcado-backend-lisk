@@ -1,4 +1,5 @@
 const { generateUUID } = require('../modules/uuid.mod')
+const { doesGameExist } = require('../modules/games.mod')
 
 const routes = require('express').Router();
 
@@ -9,6 +10,8 @@ const routes = require('express').Router();
  */
 routes.post('/create', (req, res) => {
     const { gameId, entryFee, maxPlayers, distribution: { first, second, third }} = req.body;
+
+    if (!doesGameExist(gameId)) return res.json({ msg: 'Game not found', error: true, status: 200 })
 
     // Extra checks needed: 1. Check if every user has sufficient balance to pay for entryFee
     const roomId = generateUUID();

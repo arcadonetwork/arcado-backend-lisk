@@ -1,13 +1,6 @@
-const routes = require('express').Router();
+const { games } = require('../modules/games.mod')
 
-/* Hardcoded list of supported games */
-const games = [
-    { id: 'CSGO', name: 'Counter Strike Global Offensive' },
-    { id: 'LOL', name: 'League of Legends' },
-    { id: 'GTA5', name: 'Grand Theft Auto V' },
-    { id: 'PUBG', name: 'PlayerUnknowns Battlegrounds' },
-    { id: 'FOR', name: 'Fortnite' }
-];
+const routes = require('express').Router();
 
 /**
  * Retrieve all supported games

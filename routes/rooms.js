@@ -1,5 +1,6 @@
 const { generateUUID } = require('../modules/uuid.mod')
 const { doesGameExist } = require('../modules/games.mod')
+const { verifyDistribution } = require('../modules/rooms.mod')
 
 const routes = require('express').Router();
 
@@ -9,9 +10,10 @@ const routes = require('express').Router();
  * Return: { id }
  */
 routes.post('/create', (req, res) => {
-    const { gameId, entryFee, maxPlayers, distribution: { first, second, third }} = req.body;
+    const { gameId, entryFee, maxPlayers, distribution } = req.body;
 
     if (!doesGameExist(gameId)) return res.json({ msg: 'Game not found', error: true, status: 200 })
+    if (!verifyDistribution(distribution)) return res.json({ msg: 'Distribution is incorrect', error: true, status: 200 })
 
     // Extra checks needed: 1. Check if every user has sufficient balance to pay for entryFee
     const roomId = generateUUID();

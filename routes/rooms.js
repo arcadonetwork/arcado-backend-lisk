@@ -14,7 +14,8 @@ routes.post('/create', (req, res) => {
 
     if (!doesGameExist(gameId)) return res.json({ msg: 'Game not found', error: true, status: 200 })
     if (!verifyDistribution(distribution)) return res.json({ msg: 'Distribution is incorrect', error: true, status: 200 })
-
+    if (entryFee <= 0) return res.json({ msg: 'Entry fee should be higher than 0', error: true, status: 200 })
+    
     // Extra checks needed: 1. Check if every user has sufficient balance to pay for entryFee
     const roomId = generateUUID();
     return res.json({ id: roomId });

@@ -20,10 +20,10 @@ routes.post('/create', (req, res) => {
     // check format address
 
     // Extra checks needed: 1. Check if every user that creates the room has sufficient balance to pay for entryFee
-    // by default, he'll join this room
+    // by default this user will join the new room
     const roomId = generateUUID();
-    addRoom(roomId, address, entryFee, maxPlayers, distribution)
-    return res.json({ id: roomId });
+    const room = addRoom(roomId, address, entryFee, maxPlayers, distribution)
+    return res.json({ room });
 })
 
 /**

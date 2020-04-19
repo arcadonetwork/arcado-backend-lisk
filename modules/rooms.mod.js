@@ -1,18 +1,49 @@
-// In-mem DB for [ { id, addresses: [ string ], entryFee, maxPlayers, distribution } ]
+// In-mem DB for [ { id, addresses: [ string ], entryFee, maxPlayers, distribution, status } ]
+// room.status ENUM (0: "not started", 1: "started", 2: "ended")
 let roomsDB = [];
 
 const getAllRooms = () => (roomsDB)
 
 const getRoom = id => roomsDB.find(room => room.id === id)
 
+/**
+ * @return {Object} room with status and participating addresses
+ */
 const addRoom = (id, address, entryFee, maxPlayers, distribution) => {
-    roomsDB.push({
+    const room = {
         id,
         addresses: [ address ],
         entryFee,
         maxPlayers,
-        distribution
-    })
+        distribution,
+        status: 0
+    };
+
+    roomsDB.push(room)
+    return room
+}
+
+const startRoom = id => {
+    const roomIndex = roomsDB.findIndex(room => room.id === id)
+    roomsDB[roomIndex].status = 1;
+    return roomsDB[roomIndex]
+}
+
+const endRoom = id => {
+    const roomIndex = roomsDB.findIndex(room => room.id === id)
+    roomsDB[roomIndex].status = 2;
+    return roomsDB[roomIndex]
+}
+
+const roomStatusToText = status => {
+    switch (status) {
+        case 0: 
+            return "not started"
+        case 1: 
+            return "started"
+        case 2:
+            return "ended"
+    }
 }
 
 const joinRoom = (id, address) => {
@@ -51,5 +82,8 @@ module.exports = {
     getRoom,
     addRoom,
     doesRoomExist,
-    joinRoom
+    joinRoom,
+    startRoom,
+    endRoom,
+    roomStatusToText
 }

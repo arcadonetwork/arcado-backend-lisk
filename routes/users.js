@@ -1,8 +1,9 @@
 const { addUser, getUser } = require('../modules/users.mod');
+const { createUser } = require('../modules/transactions/users.mod')
 
 const routes = require('express').Router();
 const liskPassphrase = require('@liskhq/lisk-passphrase');
-const liskCrypto = require('@liskhq/lisk-cryptography');
+const cryptography = require('@liskhq/lisk-cryptography');
 const { Mnemonic } = liskPassphrase;
 
 /**
@@ -10,18 +11,27 @@ const { Mnemonic } = liskPassphrase;
  * Body: { email }
  * Return: { passphrase, address, publicKey }
  */
-routes.post('/register', (req, res) => {
+routes.post('/register', async (req, res) => {
     const email = req.body.email;
 
     const passphrase = Mnemonic.generateMnemonic();
-    const liskAddressObject = liskCrypto.getAddressAndPublicKeyFromPassphrase(passphrase);
-    addUser(email, liskAddressObject.address, liskAddressObject.publicKey);
+    const keys = cryptography.getPrivateAndPublicKeyFromPassphrase(
+        passphrase
+    );
+    const credentials = {
+        address: cryptography.getAddressFromPublicKey(keys.publicKey),
+        passphrase: passphrase,
+        publicKey: keys.publicKey,
+        privateKey: keys.privateKey
+    };
 
-    res.json({
-        passphrase,
-        address: liskAddressObject.address,
-        publicKey: liskAddressObject.publicKey
-    })
+    addUser(email, credentials.address, credentials.publicKey);
+    try {
+        await createUser(credentials.address);
+        res.json(credentials);
+    } catch (error) {
+        res.json({ msg: 'Could not register user Lisk blockchain', error: true, status: 400 })
+    }
 })
 
 /**

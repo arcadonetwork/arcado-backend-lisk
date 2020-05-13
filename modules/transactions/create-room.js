@@ -29,7 +29,6 @@ class CreateRoomTransaction extends BaseTransaction {
     }
 
     validateAsset() {
-        // Static checks for presence of `packetId`, `postage`, `security`, and `minTrust`.
         const errors = [];
         const distributionSum = (this.asset.distribution.first + this.asset.distribution.second + this.asset.distribution.third)
         if (distributionSum !== 100) {
@@ -56,7 +55,7 @@ class CreateRoomTransaction extends BaseTransaction {
 
         asset.games.push({
             gameId: this.asset.gameId,
-            entryFee: this.asset.entryFee,
+            entryFee: this.asset.entryFee, // string
             participants: [this.asset.address],
             distribution: this.asset.distribution,
             maxPlayers: this.asset.maxPlayers
@@ -66,7 +65,20 @@ class CreateRoomTransaction extends BaseTransaction {
             ...genesis,
             asset
         };
-        store.account.set(genesis.address, updatedGenesis);   
+        store.account.set(genesis.address, updatedGenesis);
+
+        // Remove balance from user (no need for balance property in game object)
+        // don't need this property as we can calculate the players * entryFee and use the distribution to pay out
+        const player = store.account.get(this.asset.address);
+        const playerBalance = new utils.BigNum(player.balance);
+        const entryFeeBalance = new utils.BigNum(this.asset.entryFee)
+        const updatedPlayerBalance = playerBalance.sub(entryFeeBalance);
+        const updatedPlayer = {
+            ...player,
+            balance: updatedPlayerBalance.toString()
+        }
+
+        store.account.set(player.address, updatedPlayer);
         
         return errors;
     }

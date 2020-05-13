@@ -1,5 +1,5 @@
 const { addUser, getUser } = require('../modules/users.mod');
-const { createUser } = require('../modules/transactions/users.mod')
+const { createUser } = require('../modules/transactions-helpers/users.mod')
 
 const routes = require('express').Router();
 const liskPassphrase = require('@liskhq/lisk-passphrase');

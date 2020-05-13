@@ -1,7 +1,7 @@
 const { generateUUID } = require('../modules/uuid.mod')
 const { doesGameExist } = require('../modules/games.mod')
 const { verifyDistribution, addRoom, doesRoomExist, joinRoom, getRoom } = require('../modules/rooms.mod')
-
+const { sendCreateRoomTransaction } = require('../modules/transactions-helpers/create-room.mod')
 const routes = require('express').Router();
 
 /**
@@ -11,8 +11,8 @@ const routes = require('express').Router();
  * Body: { gameId: string, address, entryFee: number, maxPlayers: number, distribution: { first: number, second: number, third: number } }
  * Return: { id }
  */
-routes.post('/create', (req, res) => {
-    const { gameId, entryFee, address, maxPlayers, distribution } = req.body;
+routes.post('/create', async (req, res) => {
+    const { gameId, entryFee, address, maxPlayers, distribution, passphrase } = req.body;
 
     if (!doesGameExist(gameId)) return res.json({ msg: 'Game not found', error: true, status: 200 })
     if (!verifyDistribution(distribution)) return res.json({ msg: 'Distribution is incorrect', error: true, status: 200 })
@@ -22,6 +22,11 @@ routes.post('/create', (req, res) => {
     // Extra checks needed: 1. Check if every user that creates the room has sufficient balance to pay for entryFee
     // by default this user will join the new room
     const roomId = generateUUID();
+
+    await sendCreateRoomTransaction({
+        gameId, entryFee, address, maxPlayers, distribution
+    }, passphrase)
+    
     const room = addRoom(roomId, address, entryFee, maxPlayers, distribution)
     return res.json({ room });
 })

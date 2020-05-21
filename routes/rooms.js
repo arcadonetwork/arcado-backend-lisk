@@ -1,8 +1,19 @@
 const { generateUUID } = require('../modules/uuid.mod')
 const { doesGameExist } = require('../modules/games.mod')
-const { verifyDistribution, addRoom, doesRoomExist, joinRoom, getRoom } = require('../modules/rooms.mod')
+const { verifyDistribution, addRoom, doesRoomExist, joinRoom, getRoom, getRoomsByGameId } = require('../modules/rooms.mod')
 const { sendCreateRoomTransaction } = require('../modules/transactions-helpers/create-room.mod')
 const routes = require('express').Router();
+
+/**
+ * Retrieve a list of rooms that belong to a game
+ * Param: id (gameId)
+ * Return: { room: Array }
+ */
+routes.get('/', (req, res) => {
+    const gameId = req.params.gameId;
+    const rooms = getRoomsByGameId(gameId)
+    return res.json({ rooms });
+})
 
 /**
  * Create new game room
@@ -11,8 +22,9 @@ const routes = require('express').Router();
  * Body: { gameId: string, address, entryFee: number, maxPlayers: number, distribution: { first: number, second: number, third: number } }
  * Return: { id }
  */
-routes.post('/create', async (req, res) => {
-    const { gameId, entryFee, address, maxPlayers, distribution, passphrase } = req.body;
+routes.post('/', async (req, res) => {
+    const gameId = req.params.gameId;
+    const { entryFee, address, maxPlayers, distribution, passphrase } = req.body;
 
     if (!doesGameExist(gameId)) return res.json({ msg: 'Game not found', error: true, status: 200 })
     if (!verifyDistribution(distribution)) return res.json({ msg: 'Distribution is incorrect', error: true, status: 200 })
@@ -26,8 +38,8 @@ routes.post('/create', async (req, res) => {
     await sendCreateRoomTransaction({
         gameId, entryFee, address, maxPlayers, distribution
     }, passphrase)
-    
-    const room = addRoom(roomId, address, entryFee, maxPlayers, distribution)
+
+    const room = addRoom(gameId, roomId, address, entryFee, maxPlayers, distribution)
     return res.json({ room });
 })
 
@@ -41,9 +53,9 @@ routes.post('/join', (req, res) => {
     const { roomId, address } = req.body;
 
     if (!doesRoomExist(roomId)) return res.json({ msg: 'Room not found', error: true, status: 200 })
-    
+
     // check if tokens can be locked for this user and join room
-    
+
     const room = joinRoom(roomId, address)
     return res.json({ success: true, room });
 })

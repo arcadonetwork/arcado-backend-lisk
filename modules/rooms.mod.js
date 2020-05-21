@@ -5,13 +5,15 @@ let roomsDB = [];
 const getAllRooms = () => (roomsDB)
 
 const getRoom = id => roomsDB.find(room => room.id === id)
+const getRoomsByGameId = id => roomsDB.filter(room => room.gameId === id)
 
 /**
  * @return {Object} room with status and participating addresses
  */
-const addRoom = (id, address, entryFee, maxPlayers, distribution) => {
+const addRoom = (gameId, id, address, entryFee, maxPlayers, distribution) => {
     const room = {
         id,
+        gameId,
         addresses: [ address ],
         entryFee,
         maxPlayers,
@@ -37,9 +39,9 @@ const endRoom = id => {
 
 const roomStatusToText = status => {
     switch (status) {
-        case 0: 
+        case 0:
             return "not started"
-        case 1: 
+        case 1:
             return "started"
         case 2:
             return "ended"
@@ -59,19 +61,19 @@ const joinRoom = (id, address) => {
  */
 const doesRoomExist = roomId =>
     roomsDB.find(room => room.id === roomId)
-        ? true 
+        ? true
         : false
 
 /**
  * Sum of distribution must be = 100
- * @param {Object} distribution 
+ * @param {Object} distribution
  * @param {number} distribution.first
  * @param {number} distribution.second
  * @param {number} distribution.third
  */
 const verifyDistribution = distribution => {
     const { first, second, third } = distribution;
-    return ((first + second + third) !== 100) 
+    return ((first + second + third) !== 100)
         ? false
         : true
 }
@@ -80,6 +82,7 @@ module.exports = {
     verifyDistribution,
     getAllRooms,
     getRoom,
+    getRoomsByGameId,
     addRoom,
     doesRoomExist,
     joinRoom,

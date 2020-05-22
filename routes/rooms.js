@@ -2,7 +2,7 @@ const { generateUUID } = require('../modules/uuid.mod')
 const { doesGameExist } = require('../modules/games.mod')
 const { verifyDistribution, addRoom, doesRoomExist, joinRoom, getRoom, getRoomsByGameId } = require('../modules/rooms.mod')
 const { sendCreateRoomTransaction } = require('../modules/transactions-helpers/create-room.mod')
-const routes = require('express').Router();
+const routes = require('express').Router({ mergeParams: true });
 
 /**
  * Retrieve a list of rooms that belong to a game
@@ -24,7 +24,11 @@ routes.get('/', (req, res) => {
  */
 routes.post('/', async (req, res) => {
     const gameId = req.params.gameId;
-    const { entryFee, address, maxPlayers, distribution, passphrase } = req.body;
+    const { name, entryFee, address, maxPlayers, distribution, passphrase } = req.body;
+
+    distribution.first = Number(distribution.first);
+    distribution.second = Number(distribution.second);
+    distribution.third = Number(distribution.third);
 
     if (!doesGameExist(gameId)) return res.json({ msg: 'Game not found', error: true, status: 200 })
     if (!verifyDistribution(distribution)) return res.json({ msg: 'Distribution is incorrect', error: true, status: 200 })
@@ -39,7 +43,8 @@ routes.post('/', async (req, res) => {
         gameId, entryFee, address, maxPlayers, distribution
     }, passphrase)
 
-    const room = addRoom(gameId, roomId, address, entryFee, maxPlayers, distribution)
+    const room = addRoom(gameId, roomId, name, address, entryFee, maxPlayers, distribution)
+    console.log(room);
     return res.json({ room });
 })
 

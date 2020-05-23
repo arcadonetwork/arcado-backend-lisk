@@ -54,6 +54,9 @@ class CreateRoomTransaction extends BaseTransaction {
         }
 
         asset.games.push({
+            createdBy: this.asset.address,
+            name: this.asset.name,
+            roomId: this.asset.roomId,
             gameId: this.asset.gameId,
             entryFee: this.asset.entryFee, // string
             participants: [this.asset.address],
@@ -67,8 +70,8 @@ class CreateRoomTransaction extends BaseTransaction {
         };
         store.account.set(genesis.address, updatedGenesis);
 
-        // Remove balance from user (no need for balance property in game object)
-        // don't need this property as we can calculate the players * entryFee and use the distribution to pay out
+        // No need for balance property in game object
+        // Don't need this property as we can calculate the players * entryFee and use the distribution to pay out
         const player = store.account.get(this.asset.address);
         const playerBalance = new utils.BigNum(player.balance);
         const entryFeeBalance = new utils.BigNum(this.asset.entryFee)
@@ -84,6 +87,7 @@ class CreateRoomTransaction extends BaseTransaction {
     }
 
     undoAsset(store) {
+        // Add entryfee back to user balance
         const errors = [];
         const genesis = store.account.get("16313739661670634666L");
         

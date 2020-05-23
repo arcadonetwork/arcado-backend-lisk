@@ -4,10 +4,12 @@ const config = require('../../config')
 
 const api = new APIClient([config.liskAPI]);
 
-const sendCreateRoomTransaction = async ({ gameId, entryFee, address, distribution, maxPlayers }, passphrase) => {
+const sendCreateRoomTransaction = async ({ name, roomId, gameId, entryFee, address, distribution, maxPlayers }, passphrase) => {
     let tx = new CreateRoomTransaction({
         recipientId: address,
         asset: {
+            roomId,
+            name,
             gameId,
             entryFee,
             distribution,

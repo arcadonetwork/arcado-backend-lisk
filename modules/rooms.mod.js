@@ -1,4 +1,4 @@
-// In-mem DB for [ { id, addresses: [ string ], entryFee, maxPlayers, distribution, status } ]
+// In-mem DB for [ { id, name, addresses: [ string ], entryFee, maxPlayers, distribution, status } ]
 // room.status ENUM (0: "not started", 1: "started", 2: "ended")
 let roomsDB = [];
 
@@ -9,9 +9,11 @@ const getRoom = id => roomsDB.find(room => room.id === id)
 /**
  * @return {Object} room with status and participating addresses
  */
-const addRoom = (id, address, entryFee, maxPlayers, distribution) => {
+const addRoom = (id, gameId, name, address, entryFee, maxPlayers, distribution) => {
     const room = {
         id,
+        gameId,
+        name,
         addresses: [ address ],
         entryFee,
         maxPlayers,

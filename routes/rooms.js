@@ -2,6 +2,7 @@ const { generateUUID } = require('../modules/uuid.mod')
 const { doesGameExist } = require('../modules/games.mod')
 const { verifyDistribution, addRoom, doesRoomExist, joinRoom, getRoom } = require('../modules/rooms.mod')
 const { sendCreateRoomTransaction } = require('../modules/transactions-helpers/create-room.mod')
+const { sendJoinRoomTransaction } = require('../modules/transactions-helpers/join-room.mod')
 const routes = require('express').Router();
 
 /**
@@ -12,7 +13,7 @@ const routes = require('express').Router();
  * Return: { id }
  */
 routes.post('/create', async (req, res) => {
-    const { gameId, entryFee, address, maxPlayers, distribution, passphrase } = req.body;
+    const { name, gameId, entryFee, address, maxPlayers, distribution, passphrase } = req.body;
 
     if (!doesGameExist(gameId)) return res.json({ msg: 'Game not found', error: true, status: 200 })
     if (!verifyDistribution(distribution)) return res.json({ msg: 'Distribution is incorrect', error: true, status: 200 })
@@ -24,10 +25,10 @@ routes.post('/create', async (req, res) => {
     const roomId = generateUUID();
 
     await sendCreateRoomTransaction({
-        gameId, entryFee, address, maxPlayers, distribution
+        name, roomId, gameId, entryFee, address, maxPlayers, distribution // room ID ook op blockchain!
     }, passphrase)
     
-    const room = addRoom(roomId, address, entryFee, maxPlayers, distribution)
+    const room = addRoom(roomId, gameId, name, address, entryFee, maxPlayers, distribution)
     return res.json({ room });
 })
 
@@ -37,12 +38,15 @@ routes.post('/create', async (req, res) => {
  * Body: { roomId, address }
  * Return: { success: boolean, room: Object { addresses, entryFee, maxPlayers, distribution } }
  */
-routes.post('/join', (req, res) => {
-    const { roomId, address } = req.body;
+routes.post('/join', async (req, res) => {
+    const { roomId, address, passphrase } = req.body;
 
     if (!doesRoomExist(roomId)) return res.json({ msg: 'Room not found', error: true, status: 200 })
     
     // check if tokens can be locked for this user and join room
+    await sendJoinRoomTransaction({
+        roomId, address // not game but room
+    }, passphrase)
     
     const room = joinRoom(roomId, address)
     return res.json({ success: true, room });

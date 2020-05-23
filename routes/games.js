@@ -11,4 +11,10 @@ routes.get('/', (_, res) => {
     return res.json({ games });
 })
 
+routes.get('/:gameId', (req, res) => {
+    const gameId = req.params.gameId;
+    const game = games.find(item => item.id === gameId);
+    return res.json({ game });
+})
+
 module.exports = routes;

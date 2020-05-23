@@ -12,7 +12,7 @@ app.use(express.urlencoded({ extended: true })) // for parsing application/x-www
 
 app.use('/users', routes.users)
 app.use('/games', routes.games)
-app.use('/rooms', routes.rooms)
+app.use('/games/:gameId/rooms', routes.rooms)
 
 app.get('/', (_, res) => {
   res.send('API up and running')

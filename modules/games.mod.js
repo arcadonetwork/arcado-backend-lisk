@@ -4,6 +4,9 @@ const games = [
     { id: 'LOL', name: 'League of Legends' },
     { id: 'GTA5', name: 'Grand Theft Auto V' },
     { id: 'PUBG', name: 'PlayerUnknowns Battlegrounds' },
+    { id: 'FOR', name: 'Fortnite' },
+    { id: 'FOR', name: 'Fortnite' },
+    { id: 'FOR', name: 'Fortnite' },
     { id: 'FOR', name: 'Fortnite' }
 ];
 
@@ -14,7 +17,7 @@ const games = [
  */
 const doesGameExist = gameId =>
     games.find(game => game.id === gameId)
-        ? true 
+        ? true
         : false
 
 module.exports = {

@@ -27,9 +27,10 @@ routes.post('/register', async (req, res) => {
 
     addUser(email, credentials.address, credentials.publicKey);
     try {
-        await createUser(credentials.address);
+        //await createUser(credentials.address);
         res.json(credentials);
     } catch (error) {
+        console.log(error);
         res.json({ msg: 'Could not register user Lisk blockchain', error: true, status: 400 })
     }
 })

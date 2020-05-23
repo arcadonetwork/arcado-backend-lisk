@@ -1,19 +1,34 @@
 const { generateUUID } = require('../modules/uuid.mod')
 const { doesGameExist } = require('../modules/games.mod')
-const { verifyDistribution, addRoom, doesRoomExist, joinRoom, getRoom } = require('../modules/rooms.mod')
+const { verifyDistribution, addRoom, doesRoomExist, joinRoom, getRoom, getRoomsByGameId } = require('../modules/rooms.mod')
 const { sendCreateRoomTransaction } = require('../modules/transactions-helpers/create-room.mod')
 const { sendJoinRoomTransaction } = require('../modules/transactions-helpers/join-room.mod')
-const routes = require('express').Router();
+const routes = require('express').Router({ mergeParams: true });
+
+/**
+ * Retrieve a list of rooms that belong to a game
+ * Param: id (gameId)
+ * Return: { rooms: Array }
+ */
+routes.get('/', (req, res) => {
+    const gameId = req.params.gameId;
+    const rooms = getRoomsByGameId(gameId)
+    return res.json({ rooms });
+})
 
 /**
  * Create new game room
  * Creator of game room joins by default this room and pays the entryFee
  *
- * Body: { gameId: string, address, entryFee: number, maxPlayers: number, distribution: { first: number, second: number, third: number } }
+ * Body: { name: string, gameId: string, address, entryFee: number, maxPlayers: number, distribution: { first: number, second: number, third: number } }
  * Return: { id }
  */
-routes.post('/create', async (req, res) => {
-    const { name, gameId, entryFee, address, maxPlayers, distribution, passphrase } = req.body;
+routes.post('/', async (req, res) => {
+    const gameId = req.params.gameId;
+    const { name, entryFee, address, maxPlayers, distribution, passphrase } = req.body;
+    distribution.first = Number(distribution.first);
+    distribution.second = Number(distribution.second);
+    distribution.third = Number(distribution.third);
 
     if (!doesGameExist(gameId)) return res.json({ msg: 'Game not found', error: true, status: 200 })
     if (!verifyDistribution(distribution)) return res.json({ msg: 'Distribution is incorrect', error: true, status: 200 })
@@ -28,21 +43,23 @@ routes.post('/create', async (req, res) => {
         name, roomId, gameId, entryFee, address, maxPlayers, distribution // room ID ook op blockchain!
     }, passphrase)
     
-    const room = addRoom(roomId, gameId, name, address, entryFee, maxPlayers, distribution)
+    const room = addRoom(gameId, roomId, name, address, entryFee, maxPlayers, distribution)
     return res.json({ room });
 })
 
 /**
  * Join existing game room
  *
- * Body: { roomId, address }
+ * Query param: $id = roomId
+ * Body: { address, passphrase }
  * Return: { success: boolean, room: Object { addresses, entryFee, maxPlayers, distribution } }
  */
-routes.post('/join', async (req, res) => {
-    const { roomId, address, passphrase } = req.body;
+routes.post('/:id/join', async (req, res) => {
+    const roomId = req.params.id;
+    const { address, passphrase } = req.body;
 
     if (!doesRoomExist(roomId)) return res.json({ msg: 'Room not found', error: true, status: 200 })
-    
+
     // check if tokens can be locked for this user and join room
     await sendJoinRoomTransaction({
         roomId, address // not game but room
@@ -50,6 +67,28 @@ routes.post('/join', async (req, res) => {
     
     const room = joinRoom(roomId, address)
     return res.json({ success: true, room });
+})
+
+/**
+ * Start existing game room
+ *
+ * Body: { roomId, address }
+ * Return: { success: boolean, room: Object { addresses, entryFee, maxPlayers, distribution } }
+ */
+routes.post('/:id/start', (req, res) => {
+    const roomId = req.params.id;
+    return res.json({ success: true });
+})
+
+/**
+ * Stop existing game room
+ *
+ * Body: { roomId, address }
+ * Return: { success: boolean, room: Object { addresses, entryFee, maxPlayers, distribution } }
+ */
+routes.post('/:id/stop', (req, res) => {
+    const roomId = req.params.id;
+    return res.json({ success: true });
 })
 
 /**

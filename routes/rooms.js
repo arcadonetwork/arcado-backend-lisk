@@ -39,12 +39,11 @@ routes.post('/', async (req, res) => {
     // by default this user will join the new room
     const roomId = generateUUID();
 
-    await sendCreateRoomTransaction({
+    /*await sendCreateRoomTransaction({
         gameId, entryFee, address, maxPlayers, distribution
-    }, passphrase)
+    }, passphrase)*/
 
     const room = addRoom(gameId, roomId, name, address, entryFee, maxPlayers, distribution)
-    console.log(room);
     return res.json({ room });
 })
 
@@ -54,15 +53,37 @@ routes.post('/', async (req, res) => {
  * Body: { roomId, address }
  * Return: { success: boolean, room: Object { addresses, entryFee, maxPlayers, distribution } }
  */
-routes.post('/join', (req, res) => {
-    const { roomId, address } = req.body;
+routes.post('/:id/join', (req, res) => {
+    const roomId = req.params.id;
+    const { address } = req.body;
 
     if (!doesRoomExist(roomId)) return res.json({ msg: 'Room not found', error: true, status: 200 })
 
     // check if tokens can be locked for this user and join room
-
     const room = joinRoom(roomId, address)
     return res.json({ success: true, room });
+})
+
+/**
+ * Start existing game room
+ *
+ * Body: { roomId, address }
+ * Return: { success: boolean, room: Object { addresses, entryFee, maxPlayers, distribution } }
+ */
+routes.post('/:id/start', (req, res) => {
+    const roomId = req.params.id;
+    return res.json({ success: true });
+})
+
+/**
+ * Stop existing game room
+ *
+ * Body: { roomId, address }
+ * Return: { success: boolean, room: Object { addresses, entryFee, maxPlayers, distribution } }
+ */
+routes.post('/:id/stop', (req, res) => {
+    const roomId = req.params.id;
+    return res.json({ success: true });
 })
 
 /**

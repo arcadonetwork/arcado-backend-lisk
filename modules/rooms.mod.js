@@ -19,9 +19,9 @@ const addRoom = (gameId, id, name, address, entryFee, maxPlayers, distribution) 
         entryFee,
         maxPlayers,
         distribution,
-        status: 0
+        status: 0,
+        createdBy: address
     };
-
     roomsDB.push(room)
     return room
 }

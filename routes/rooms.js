@@ -3,6 +3,7 @@ const { doesGameExist } = require('../modules/games.mod')
 const { verifyDistribution, addRoom, doesRoomExist, joinRoom, getRoom, getRoomsByGameId } = require('../modules/rooms.mod')
 const { sendCreateRoomTransaction } = require('../modules/transactions-helpers/create-room.mod')
 const { sendJoinRoomTransaction } = require('../modules/transactions-helpers/join-room.mod')
+const { sendStartRoomTransaction } = require('../modules/transactions-helpers/start-room.mod')
 const routes = require('express').Router({ mergeParams: true });
 
 /**
@@ -75,8 +76,20 @@ routes.post('/:id/join', async (req, res) => {
  * Body: { roomId, address }
  * Return: { success: boolean, room: Object { addresses, entryFee, maxPlayers, distribution } }
  */
-routes.post('/:id/start', (req, res) => {
+routes.post('/:id/start', async (req, res) => {
     const roomId = req.params.id;
+    const { address, passphrase } = req.body;
+
+    try {
+        await sendStartRoomTransaction({
+            roomId, address
+        }, passphrase)
+    } catch (error) {
+        return res.json({ msg: 'You are not the owner of the room', error: true, status: 200 })
+    }
+
+    // what if user is not owner? Can we catch the error?
+
     return res.json({ success: true });
 })
 

@@ -61,7 +61,8 @@ class CreateRoomTransaction extends BaseTransaction {
             entryFee: this.asset.entryFee, // string
             participants: [this.asset.address],
             distribution: this.asset.distribution,
-            maxPlayers: this.asset.maxPlayers
+            maxPlayers: this.asset.maxPlayers,
+            status: 0 // 0 open to join, 1 started, 2 ended
         })
 
         const updatedGenesis = {
@@ -91,7 +92,7 @@ class CreateRoomTransaction extends BaseTransaction {
         const errors = [];
         const genesis = store.account.get("16313739661670634666L");
         
-        const gameIndex = genesis.asset.games.findIndex(game => game.gameId === this.asset.gameId)
+        const gameIndex = genesis.asset.games.findIndex(game => game.roomId === this.asset.roomId)
         
         let asset = {
             ...genesis.asset

@@ -43,7 +43,7 @@ routes.post('/', async (req, res) => {
     await sendCreateRoomTransaction({
         name, roomId, gameId, entryFee, address, maxPlayers, distribution // room ID ook op blockchain!
     }, passphrase)
-    
+
     const room = addRoom(gameId, roomId, name, address, entryFee, maxPlayers, distribution)
     return res.json({ room });
 })
@@ -65,7 +65,7 @@ routes.post('/:id/join', async (req, res) => {
     await sendJoinRoomTransaction({
         roomId, address // not game but room
     }, passphrase)
-    
+
     const room = joinRoom(roomId, address)
     return res.json({ success: true, room });
 })

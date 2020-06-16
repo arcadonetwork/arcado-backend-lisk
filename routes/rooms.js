@@ -1,6 +1,6 @@
 const { generateUUID } = require('../modules/uuid.mod')
 const { doesGameExist } = require('../modules/games.mod')
-const { verifyDistribution, addRoom, doesRoomExist, joinRoom, getRoom, getRoomsByGameId } = require('../modules/rooms.mod')
+const { verifyDistribution, addRoom, doesRoomExist, joinRoom, getRoom, getRoomsByGameId, startRoom, endRoom} = require('../modules/rooms.mod')
 const { sendCreateRoomTransaction } = require('../modules/transactions-helpers/create-room.mod')
 const { sendJoinRoomTransaction } = require('../modules/transactions-helpers/join-room.mod')
 const { sendStartRoomTransaction } = require('../modules/transactions-helpers/start-room.mod')
@@ -86,6 +86,8 @@ routes.post('/:id/start', async (req, res) => {
         await sendStartRoomTransaction({
             roomId, address
         }, passphrase)
+
+        startRoom(roomId)
     } catch (error) {
         return res.json({ msg: 'You are not the owner of the room', error: true, status: 200 })
     }
@@ -102,13 +104,13 @@ routes.post('/:id/start', async (req, res) => {
 routes.post('/:id/stop', async (req, res) => {
     const roomId = req.params.id;
     const { first, second, third, address, passphrase } = req.body; // Addresses of winners
-
     try {
         await sendStopRoomTransaction({
             roomId, address, first, second, third
         }, passphrase)
+
+        endRoom(roomId)
     } catch (error) {
-        console.log(error)
         return res.json({ msg: 'You are not the owner of the room', error: true, status: 200 })
     }
 

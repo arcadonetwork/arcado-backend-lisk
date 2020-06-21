@@ -32,9 +32,12 @@ const startRoom = id => {
     return roomsDB[roomIndex]
 }
 
-const endRoom = id => {
+const endRoom = (id, first, second, third) => {
     const roomIndex = roomsDB.findIndex(room => room.id === id)
     roomsDB[roomIndex].status = 2;
+    roomsDB[roomIndex].endResult = {
+        first, second, third
+    };
     return roomsDB[roomIndex]
 }
 

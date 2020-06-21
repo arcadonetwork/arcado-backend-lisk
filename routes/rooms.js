@@ -109,7 +109,7 @@ routes.post('/:id/stop', async (req, res) => {
             roomId, address, first, second, third
         }, passphrase)
 
-        endRoom(roomId)
+        endRoom(roomId, first, second, third)
     } catch (error) {
         return res.json({ msg: 'You are not the owner of the room', error: true, status: 200 })
     }

@@ -36,6 +36,34 @@ routes.post('/register', async (req, res) => {
 })
 
 /**
+ * POST to login user
+ * Body: { email, passphrase }
+ * Return: { passphrase, address, publicKey }
+ */
+routes.post('/:email', async (req, res) => {
+    const {email, passphrase} = req.body;
+    const keys = cryptography.getPrivateAndPublicKeyFromPassphrase(
+        passphrase
+    );
+
+    const address = cryptography.getAddressFromPublicKey(keys.publicKey);
+    const user = getUser(email)
+
+    if (!user || user.address !== address) {
+        return res.json({ msg: 'User not found', error: true, status: 200 })
+    }
+
+    res.json({
+        address,
+        passphrase: passphrase,
+        publicKey: keys.publicKey
+    });
+})
+
+
+
+
+/**
  * Retrieve single user
  * Param: email
  * Return: { address, publicKey, email }

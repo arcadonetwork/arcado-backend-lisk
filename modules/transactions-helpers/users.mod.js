@@ -6,7 +6,7 @@ const api = new APIClient([config.liskAPI]);
 
 const createUser = async (address) => {
     let tx = new transactions.TransferTransaction({
-        amount: '100000000',
+        amount: '10000000000',
         recipientId: address
     });
 
@@ -15,6 +15,12 @@ const createUser = async (address) => {
     return api.transactions.broadcast(tx.toJSON())
 }
 
+const getAccount = async (address) => {
+    const accounts = await api.accounts.get({ address }).then(({ data }) => data);
+    return accounts && accounts.length > 0 ? accounts[0] : undefined;
+}
+
 module.exports = {
-    createUser
+    createUser,
+    getAccount
 }

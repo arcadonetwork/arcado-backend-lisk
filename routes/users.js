@@ -1,5 +1,5 @@
 const { addUser, getUser } = require('../modules/users.mod');
-const { createUser } = require('../modules/transactions-helpers/users.mod')
+const { createUser, getAccount } = require('../modules/transactions-helpers/users.mod')
 
 const routes = require('express').Router();
 const liskPassphrase = require('@liskhq/lisk-passphrase');
@@ -19,6 +19,7 @@ routes.post('/register', async (req, res) => {
         passphrase
     );
     const credentials = {
+        email,
         address: cryptography.getAddressFromPublicKey(keys.publicKey),
         passphrase: passphrase,
         publicKey: keys.publicKey,
@@ -28,7 +29,13 @@ routes.post('/register', async (req, res) => {
     addUser(email, credentials.address, credentials.publicKey);
     try {
         await createUser(credentials.address);
-        res.json(credentials);
+        return res.json({
+            address: credentials.address,
+            publicKey: credentials.publicKey,
+            privateKey: credentials.privateKey,
+            email,
+            passphrase
+        });
     } catch (error) {
         console.log(error);
         res.json({ msg: 'Could not register user Lisk blockchain', error: true, status: 400 })
@@ -68,18 +75,23 @@ routes.post('/:email', async (req, res) => {
  * Param: email
  * Return: { address, publicKey, email }
  */
-routes.get('/:email', (req, res) => {
+routes.get('/:email', async (req, res) => {
     const email = req.params.email;
-    const user = getUser(email)
+
+    const user = getUser(email);
+
 
     if (!user) {
         return res.json({ msg: 'User not found', error: true, status: 200 })
     }
 
+    const account = await getAccount(user.address);
+
     return res.json({
         address: user.address,
         publicKey: user.publicKey,
-        email
+        email,
+        ...account
     });
 })
 

@@ -39,9 +39,9 @@ class JoinRoomTransaction extends BaseTransaction {
         const errors = [];
         const genesis = store.account.get("16313739661670634666L");
         const player = store.account.get(this.asset.address);
-        
-        const game = genesis.asset.games.find(game => game.roomId === this.asset.roomId)
-        if (!game) {
+
+        const room = genesis.asset.rooms.find(room => room.roomId === this.asset.roomId)
+        if (!room) {
             errors.push(
                 new TransactionError(
                     '"asset.roomId" does not exist',
@@ -53,20 +53,20 @@ class JoinRoomTransaction extends BaseTransaction {
             return errors;
         }
 
-        if (game.participants.length >= game.maxPlayers) {
+        if (room.participants.length >= room.maxPlayers) {
             errors.push(
                 new TransactionError(
-                    'Game is already full',
+                    'Room is already full',
                     this.id,
                     '.asset.maxPlayers',
-                    game.maxPlayers
+                    room.maxPlayers
                 )
             );
             return errors;
         }
 
         const playerBalance = new utils.BigNum(player.balance);
-        if (playerBalance.lt(game.entryFee)) {
+        if (playerBalance.lt(room.entryFee)) {
             errors.push(
                 new TransactionError(
                     'Insufficient balance for player',
@@ -77,13 +77,13 @@ class JoinRoomTransaction extends BaseTransaction {
             );
             return errors;
         }
-        
+
         let asset = {
             ...genesis.asset
         }
 
-        const gameIndex = asset.games.findIndex(game => game.roomId === this.asset.roomId)
-        asset.games[gameIndex].participants.push(this.asset.address)
+        const roomIndex = asset.rooms.findIndex(room => room.roomId === this.asset.roomId)
+        asset.rooms[roomIndex].participants.push(this.asset.address)
 
         const updatedGenesis = {
             ...genesis,
@@ -92,7 +92,7 @@ class JoinRoomTransaction extends BaseTransaction {
         store.account.set(genesis.address, updatedGenesis);
 
         // Substract fee from user
-        const entryFeeBalance = new utils.BigNum(game.entryFee)
+        const entryFeeBalance = new utils.BigNum(room.entryFee)
         const updatedPlayerBalance = playerBalance.sub(entryFeeBalance);
         const updatedPlayer = {
             ...player,
@@ -100,14 +100,13 @@ class JoinRoomTransaction extends BaseTransaction {
         }
 
         store.account.set(player.address, updatedPlayer);
-        
+
         return errors;
     }
 
     undoAsset(store) {
         // Add entryfee back to user balance
         const errors = [];
-        
 
         return errors;
     }

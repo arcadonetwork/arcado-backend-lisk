@@ -28,7 +28,6 @@ class CreateRoomTransaction extends BaseTransaction {
         ]);
     }
 
-
     validateAsset() {
         const errors = [];
         const distributionSum = (this.asset.distribution.first + this.asset.distribution.second + this.asset.distribution.third)

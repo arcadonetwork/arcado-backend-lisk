@@ -42,6 +42,7 @@ routes.post('/', async (req, res) => {
     // by default this user will join the new room
     const roomId = generateUUID();
 
+    console.log(name, roomId, gameId, entryFee, address, maxPlayers, distribution)
     await sendCreateRoomTransaction({
         name, roomId, gameId, entryFee, address, maxPlayers, distribution // room ID ook op blockchain!
     }, passphrase)
@@ -58,15 +59,16 @@ routes.post('/', async (req, res) => {
  * Return: { success: boolean, room: Object { addresses, entryFee, maxPlayers, distribution } }
  */
 routes.post('/:id/join', async (req, res) => {
-    const roomId = req.params.id;
+    const { id: roomId, gameId } = req.params;
     const { address, passphrase } = req.body;
 
-    if (!doesRoomExist(roomId)) return res.json({ msg: 'Room not found', error: true, status: 200 })
 
+    if (!doesRoomExist(roomId)) return res.json({ msg: 'Room not found', error: true, status: 200 })
     // check if tokens can be locked for this user and join room
     await sendJoinRoomTransaction({
-        roomId, address // not game but room
+        gameId, roomId, address // not game but room
     }, passphrase)
+
 
     const room = joinRoom(roomId, address)
     return res.json({ success: true, room });
@@ -82,6 +84,7 @@ routes.post('/:id/start', async (req, res) => {
     const roomId = req.params.id;
     const { address, passphrase } = req.body;
 
+    console.log( address, passphrase)
     try {
         await sendStartRoomTransaction({
             roomId, address
@@ -108,6 +111,7 @@ routes.post('/:id/stop', async (req, res) => {
         await sendStopRoomTransaction({
             roomId, address, first, second, third
         }, passphrase)
+
 
         endRoom(roomId, first, second, third)
     } catch (error) {

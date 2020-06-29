@@ -43,15 +43,15 @@ class StopRoomTransaction extends BaseTransaction {
         const genesis = store.account.get("16313739661670634666L");
 
         // Check if sender is the owner of the room otherwise reject
-        const game = genesis.asset.games.find(game => game.roomId === this.asset.roomId)
-        if (game.createdBy !== this.asset.address) {
+        const room = genesis.asset.rooms.find(room => room.roomId === this.asset.roomId)
+        if (room.createdBy !== this.asset.address) {
             errors.push(
                 new TransactionError(
                     '"asset.address" does not match createdBy field for room - you are not the owner of the room',
                     this.id,
                     '.asset.address',
                     this.asset.address,
-                    game.createdBy
+                    room.createdBy
                 )
             );
             return errors;
@@ -62,8 +62,8 @@ class StopRoomTransaction extends BaseTransaction {
         }
 
         // Update status for game room
-        const gameIndex = asset.games.findIndex(game => game.roomId === this.asset.roomId)
-        asset.games[gameIndex].status = 2 // stopped
+        const roomIndex = asset.rooms.findIndex(room => room.roomId === this.asset.roomId)
+        asset.rooms[roomIndex].status = 2 // stopped
 
         const updatedGenesis = {
             ...genesis,
@@ -72,9 +72,9 @@ class StopRoomTransaction extends BaseTransaction {
         store.account.set(genesis.address, updatedGenesis);
 
         // Pay out the winnings
-        const distribution = asset.games[gameIndex].distribution
-        const numOfParticipants = asset.games[gameIndex].participants.length
-        const entryFeeBalance = new utils.BigNum(asset.games[gameIndex].entryFee)
+        const distribution = asset.rooms[roomIndex].distribution
+        const numOfParticipants = asset.rooms[roomIndex].participants.length
+        const entryFeeBalance = new utils.BigNum(asset.rooms[roomIndex].entryFee)
         const total = entryFeeBalance.mul(numOfParticipants)
         const firstWinnings = total.div(100).mul(distribution.first)
         const secondWinnings = total.div(100).mul(distribution.second)
@@ -109,7 +109,8 @@ class StopRoomTransaction extends BaseTransaction {
             balance: updatedThirdBalance.toString()
         }
         store.account.set(thirdPlayer.address, updatedThirdPlayer);
-        
+
+
         return errors;
     }
 
@@ -117,18 +118,18 @@ class StopRoomTransaction extends BaseTransaction {
     undoAsset(store) {
         const errors = [];
         const genesis = store.account.get("16313739661670634666L");
-        
-        const gameIndex = genesis.asset.games.findIndex(game => game.roomId === this.asset.roomId)
-        
+
+        const roomIndex = genesis.asset.rooms.findIndex(room => room.roomId === this.asset.roomId)
+
         let asset = {
             ...genesis.asset
         }
-        asset.games[gameIndex].status = 1
+        asset.rooms[roomIndex].status = 1
         const updatedGenesis = {
             ...genesis,
             asset
         };
-        store.account.set(genesis.address, updatedGenesis); 
+        store.account.set(genesis.address, updatedGenesis);
 
         return errors;
     }

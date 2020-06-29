@@ -28,6 +28,7 @@ class CreateRoomTransaction extends BaseTransaction {
         ]);
     }
 
+
     validateAsset() {
         const errors = [];
         const distributionSum = (this.asset.distribution.first + this.asset.distribution.second + this.asset.distribution.third)
@@ -83,7 +84,7 @@ class CreateRoomTransaction extends BaseTransaction {
         }
 
         store.account.set(player.address, updatedPlayer);
-        
+
         return errors;
     }
 
@@ -91,9 +92,9 @@ class CreateRoomTransaction extends BaseTransaction {
         // Add entryfee back to user balance
         const errors = [];
         const genesis = store.account.get("16313739661670634666L");
-        
+
         const gameIndex = genesis.asset.games.findIndex(game => game.roomId === this.asset.roomId)
-        
+
         let asset = {
             ...genesis.asset
         }
@@ -102,7 +103,7 @@ class CreateRoomTransaction extends BaseTransaction {
             ...genesis,
             asset
         };
-        store.account.set(genesis.address, updatedGenesis); 
+        store.account.set(genesis.address, updatedGenesis);
 
         return errors;
     }

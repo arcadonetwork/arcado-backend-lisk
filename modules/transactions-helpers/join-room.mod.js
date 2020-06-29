@@ -4,18 +4,18 @@ const config = require('../../config')
 
 const api = new APIClient([config.liskAPI]);
 
-const sendJoinRoomTransaction = async ({ roomId, address }, passphrase) => {
+const sendJoinRoomTransaction = async ({ roomId, address, gameId }, passphrase) => {
     let tx = new JoinRoomTransaction({
         recipientId: address,
         asset: {
+            gameId,
             roomId,
             address
         }
     });
 
     tx.sign(passphrase);
-
-    return api.transactions.broadcast(tx.toJSON())
+    return api.transactions.broadcast(tx.toJSON());
 }
 
 module.exports = {

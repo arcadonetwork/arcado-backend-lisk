@@ -37,15 +37,15 @@ class StartRoomTransaction extends BaseTransaction {
         const genesis = store.account.get("16313739661670634666L");
 
         // Check if sender is the owner of the room otherwise reject
-        const game = genesis.asset.games.find(game => game.roomId === this.asset.roomId)
-        if (game.createdBy !== this.asset.address) {
+        const room = genesis.asset.rooms.find(room => room.roomId === this.asset.roomId)
+        if (room.createdBy !== this.asset.address) {
             errors.push(
                 new TransactionError(
                     '"asset.address" does not match createdBy field for room - you are not the owner of the room',
                     this.id,
                     '.asset.address',
                     this.asset.address,
-                    game.createdBy
+                    room.createdBy
                 )
             );
             return errors;
@@ -55,15 +55,15 @@ class StartRoomTransaction extends BaseTransaction {
             ...genesis.asset
         }
 
-        const gameIndex = asset.games.findIndex(game => game.roomId === this.asset.roomId)
-        asset.games[gameIndex].status = 1 // started
+        const roomIndex = asset.rooms.findIndex(room => room.roomId === this.asset.roomId)
+        asset.rooms[roomIndex].status = 1 // started
 
         const updatedGenesis = {
             ...genesis,
             asset
         };
         store.account.set(genesis.address, updatedGenesis);
-        
+
         return errors;
     }
 
@@ -71,18 +71,18 @@ class StartRoomTransaction extends BaseTransaction {
     undoAsset(store) {
         const errors = [];
         const genesis = store.account.get("16313739661670634666L");
-        
-        const gameIndex = genesis.asset.games.findIndex(game => game.roomId === this.asset.roomId)
-        
+
+        const roomIndex = genesis.asset.rooms.findIndex(room => room.roomId === this.asset.roomId)
+
         let asset = {
             ...genesis.asset
         }
-        asset.games[gameIndex].status = 0
+        asset.rooms[roomIndex].status = 0
         const updatedGenesis = {
             ...genesis,
             asset
         };
-        store.account.set(genesis.address, updatedGenesis); 
+        store.account.set(genesis.address, updatedGenesis);
 
         return errors;
     }

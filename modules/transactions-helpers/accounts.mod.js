@@ -4,12 +4,12 @@ const config = require('../../config')
 
 const api = new APIClient([config.liskAPI]);
 
-const createUser = async (address) => {
+const addBalanceFromGenesis = async (address) => {
     let tx = new transactions.TransferTransaction({
-        amount: '1000000000000',
-        recipientId: address
+        asset: { senderId: config.genesis_address, recipientId: address, amount: '1000000000000' },
+        networkIdentifier: config.NETWORK_IDENTIFIER,
+        timestamp: transactions.utils.getTimeFromBlockchainEpoch(Number(new Date()) - 10000)
     });
-
     tx.sign(config.genesis);
     return api.transactions.broadcast(tx.toJSON())
 }
@@ -20,6 +20,6 @@ const getAccount = async (address) => {
 }
 
 module.exports = {
-    createUser,
+    addBalanceFromGenesis,
     getAccount
 }

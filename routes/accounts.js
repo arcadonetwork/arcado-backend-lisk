@@ -1,5 +1,4 @@
-const { addUser, getUser } = require('../modules/users.mod');
-const { createUser, getAccount } = require('../modules/transactions-helpers/users.mod')
+const { createUser, getAccount, addBalanceFromGenesis, getTransactionsByAddress } = require('../modules/transactions-helpers/accounts.mod')
 
 const routes = require('express').Router();
 const liskPassphrase = require('@liskhq/lisk-passphrase');
@@ -26,7 +25,6 @@ routes.post('/register', async (req, res) => {
         privateKey: keys.privateKey
     };
 
-    addUser(email, credentials.address, credentials.publicKey);
     try {
         await createUser(credentials.address);
         return res.json({
@@ -43,56 +41,47 @@ routes.post('/register', async (req, res) => {
 })
 
 /**
- * POST to login user
- * Body: { email, passphrase }
- * Return: { passphrase, address, publicKey }
+ * Retrieve single user
+ * Param: email
+ * Return: { address, publicKey, email }
  */
-routes.post('/:email', async (req, res) => {
-    const {email, passphrase} = req.body;
-    const keys = cryptography.getPrivateAndPublicKeyFromPassphrase(
-        passphrase
-    );
-
-    const address = cryptography.getAddressFromPublicKey(keys.publicKey);
-    const user = getUser(email)
-
-    if (!user || user.address !== address) {
-        return res.json({ msg: 'User not found', error: true, status: 200 })
-    }
-
-    res.json({
-        address,
-        passphrase: passphrase,
-        publicKey: keys.publicKey
+routes.get('/:address', async (req, res) => {
+    const address = req.params.address;
+    const account = await getAccount(address);
+    return res.json({
+        data: account
     });
 })
-
-
-
 
 /**
  * Retrieve single user
  * Param: email
  * Return: { address, publicKey, email }
  */
-routes.get('/:email', async (req, res) => {
-    const email = req.params.email;
-
-    const user = getUser(email);
-
-
-    if (!user) {
-        return res.json({ msg: 'User not found', error: true, status: 200 })
-    }
-
-    const account = await getAccount(user.address);
-
+routes.get('/:address/transactions', async (req, res) => {
+    const address = req.params.address;
+    const transactions = await getTransactionsByAddress(address);
+    console.log(transactions);
     return res.json({
-        address: user.address,
-        publicKey: user.publicKey,
-        email,
-        ...account
+        data: transactions
     });
+})
+
+/**
+ * Retrieve single user
+ * Param: email
+ * Return: { address, publicKey, email }
+ */
+routes.post('/:address/funds', async (req, res) => {
+    try {
+        const { address } = req.params;
+        const { data } = await addBalanceFromGenesis(address);
+        return res.json({
+            data
+        });
+    } catch (e) {
+        console.error(e);
+    }
 })
 
 module.exports = routes;

@@ -6,10 +6,14 @@ const api = new APIClient([config.liskAPI]);
 
 const addBalanceFromGenesis = async (address) => {
     let tx = new transactions.TransferTransaction({
-        asset: { senderId: config.genesis_address, recipientId: address, amount: '1000000000000' },
+        asset : {
+            recipientId: address,
+            amount: '1000000000000'
+        },
         networkIdentifier: config.NETWORK_IDENTIFIER,
         timestamp: transactions.utils.getTimeFromBlockchainEpoch(Number(new Date()) - 10000)
     });
+    transactions.utils.
     tx.sign(config.genesis);
     return api.transactions.broadcast(tx.toJSON())
 }

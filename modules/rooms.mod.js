@@ -4,15 +4,15 @@ let roomsDB = [];
 
 const getAllRooms = () => (roomsDB)
 
-const getRoom = id => roomsDB.find(room => room.id === id)
+const getRoom = roomId => roomsDB.find(room => room.roomId === roomId)
 const getRoomsByGameId = id => roomsDB.filter(room => room.gameId === id)
 
 /**
  * @return {Object} room with status and participating addresses
  */
-const addRoom = (gameId, id, name, address, entryFee, maxPlayers, distribution) => {
+const addRoom = (gameId, roomId, name, address, entryFee, maxPlayers, distribution) => {
     const room = {
-        id,
+        roomId,
         gameId,
         name,
         addresses: [ address ],
@@ -26,14 +26,14 @@ const addRoom = (gameId, id, name, address, entryFee, maxPlayers, distribution) 
     return room
 }
 
-const startRoom = id => {
-    const roomIndex = roomsDB.findIndex(room => room.id === id)
+const startRoom = roomId => {
+    const roomIndex = roomsDB.findIndex(room => room.roomId === roomId)
     roomsDB[roomIndex].status = 1;
     return roomsDB[roomIndex]
 }
 
-const endRoom = (id, first, second, third) => {
-    const roomIndex = roomsDB.findIndex(room => room.id === id)
+const endRoom = (roomId, first, second, third) => {
+    const roomIndex = roomsDB.findIndex(room => room.roomId === roomId)
     roomsDB[roomIndex].status = 2;
     roomsDB[roomIndex].endResult = {
         first, second, third
@@ -52,8 +52,8 @@ const roomStatusToText = status => {
     }
 }
 
-const joinRoom = (id, address) => {
-    const roomIndex = roomsDB.findIndex(room => room.id === id)
+const joinRoom = (roomId, address) => {
+    const roomIndex = roomsDB.findIndex(room => room.roomId === roomId)
     roomsDB[roomIndex].addresses.push(address)
     return roomsDB[roomIndex]
 }
@@ -63,10 +63,7 @@ const joinRoom = (id, address) => {
  * @param {string} roomId e.g. 10aliy85
  * @return {boolean}
  */
-const doesRoomExist = roomId =>
-    roomsDB.find(room => room.id === roomId)
-        ? true
-        : false
+const doesRoomExist = roomId => !!roomsDB.find(room => room.roomId === roomId)
 
 /**
  * Sum of distribution must be = 100

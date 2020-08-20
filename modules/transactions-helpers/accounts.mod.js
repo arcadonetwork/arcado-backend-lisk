@@ -13,7 +13,6 @@ const addBalanceFromGenesis = async (address) => {
         networkIdentifier: config.NETWORK_IDENTIFIER,
         timestamp: transactions.utils.getTimeFromBlockchainEpoch(Number(new Date()) - 10000)
     });
-    transactions.utils.
     tx.sign(config.genesis);
     return api.transactions.broadcast(tx.toJSON())
 }

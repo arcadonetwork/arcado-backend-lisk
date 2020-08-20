@@ -45,10 +45,10 @@ routes.post('/', async (req, res) => {
     console.log(name, roomId, gameId, entryFee, address, maxPlayers, distribution)
     await sendCreateRoomTransaction({
         name, roomId, gameId, entryFee, address, maxPlayers, distribution // room ID ook op blockchain!
-    }, passphrase)
+    }, passphrase);
 
-    const room = addRoom(gameId, roomId, name, address, entryFee, maxPlayers, distribution)
-    return res.json({ room });
+    await addRoom(gameId, roomId, name, address, entryFee, maxPlayers, distribution)
+    return res.json({ success: true, roomId, gameId });
 })
 
 /**
@@ -69,7 +69,6 @@ routes.post('/:id/join', async (req, res) => {
         gameId, roomId, address // not game but room
     }, passphrase)
 
-
     const room = joinRoom(roomId, address)
     return res.json({ success: true, room });
 })
@@ -84,7 +83,6 @@ routes.post('/:id/start', async (req, res) => {
     const roomId = req.params.id;
     const { address, passphrase } = req.body;
 
-    console.log( address, passphrase)
     try {
         await sendStartRoomTransaction({
             roomId, address

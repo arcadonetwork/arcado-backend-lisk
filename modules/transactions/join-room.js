@@ -23,7 +23,7 @@ class JoinRoomTransaction extends BaseTransaction {
     async prepare(store) {
         await store.account.cache([
             {
-                address: "16313739661670634666L", // genesis
+                address: "11237980039345381032L", // genesis
             },
             {
                 address: this.asset.address,
@@ -37,7 +37,7 @@ class JoinRoomTransaction extends BaseTransaction {
 
     applyAsset(store) {
         const errors = [];
-        const genesis = store.account.get("16313739661670634666L");
+        const genesis = store.account.get("11237980039345381032L");
         const player = store.account.get(this.asset.address);
 
         const room = genesis.asset.rooms.find(room => room.roomId === this.asset.roomId)

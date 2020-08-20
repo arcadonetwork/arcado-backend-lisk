@@ -20,7 +20,7 @@ class CreateRoomTransaction extends BaseTransaction {
     async prepare(store) {
         await store.account.cache([
             {
-                address: "16313739661670634666L", // genesis
+                address: "11237980039345381032L", // genesis
             },
             {
                 address: this.asset.address,
@@ -47,7 +47,7 @@ class CreateRoomTransaction extends BaseTransaction {
 
     applyAsset(store) {
         const errors = [];
-        const genesis = store.account.get("16313739661670634666L");
+        const genesis = store.account.get("11237980039345381032L");
         let asset = {
             games: [],
             ...genesis.asset
@@ -90,7 +90,7 @@ class CreateRoomTransaction extends BaseTransaction {
     undoAsset(store) {
         // Add entryfee back to user balance
         const errors = [];
-        const genesis = store.account.get("16313739661670634666L");
+        const genesis = store.account.get("11237980039345381032L");
 
         const gameIndex = genesis.asset.games.findIndex(game => game.roomId === this.asset.roomId)
 

@@ -10,7 +10,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 
-app.use('/users', routes.users)
+app.use('/accounts', routes.accounts)
 app.use('/games', routes.games)
 app.use('/games/:gameId/rooms', routes.rooms)
 

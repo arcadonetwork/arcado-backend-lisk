@@ -20,7 +20,7 @@ class StopRoomTransaction extends BaseTransaction {
     async prepare(store) {
         await store.account.cache([
             {
-                address: "16313739661670634666L" // genesis
+                address: "11237980039345381032L" // genesis
             },
             {
                 address: this.asset.first
@@ -40,7 +40,7 @@ class StopRoomTransaction extends BaseTransaction {
 
     applyAsset(store) {
         const errors = [];
-        const genesis = store.account.get("16313739661670634666L");
+        const genesis = store.account.get("11237980039345381032L");
 
         // Check if sender is the owner of the room otherwise reject
         const room = genesis.asset.rooms.find(room => room.roomId === this.asset.roomId)
@@ -117,7 +117,7 @@ class StopRoomTransaction extends BaseTransaction {
     /* Revert status game */
     undoAsset(store) {
         const errors = [];
-        const genesis = store.account.get("16313739661670634666L");
+        const genesis = store.account.get("11237980039345381032L");
 
         const roomIndex = genesis.asset.rooms.findIndex(room => room.roomId === this.asset.roomId)
 
